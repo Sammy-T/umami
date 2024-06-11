@@ -2,6 +2,9 @@
 
 Umami is a simple, fast, privacy-focused alternative to Google Analytics.
 
+> [!NOTE]
+> This branch extends Umami to include CockroachDB support.
+
 ## Getting started
 
 A detailed getting started guide can be found at [https://umami.is/docs/](https://umami.is/docs/)
@@ -34,6 +37,13 @@ Create an `.env` file with the following
 ```
 DATABASE_URL=connection-url
 ```
+
+> [!NOTE]
+> This branch expects an additional environment variable to enable CockroachDB:
+>
+> ```js
+> COCKROACH_DB=true
+> ```
 
 The connection url is in the following format:
 
