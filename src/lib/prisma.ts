@@ -92,7 +92,7 @@ function getDateSQL(field: string, unit: string, timezone?: string): string {
 function getDateWeeklySQL(field: string, timezone?: string) {
   const db = getDatabaseType();
 
-  if (db === POSTGRESQL) {
+  if (db === POSTGRESQL || db === COCKROACHDB) {
     return `concat(extract(dow from (${field} at time zone '${timezone}')), ':', to_char((${field} at time zone '${timezone}'), 'HH24'))`;
   }
 
@@ -105,7 +105,7 @@ function getDateWeeklySQL(field: string, timezone?: string) {
 export function getTimestampSQL(field: string) {
   const db = getDatabaseType();
 
-  if (db === POSTGRESQL) {
+  if (db === POSTGRESQL || db === COCKROACHDB) {
     return `floor(extract(epoch from ${field}))`;
   }
 
@@ -128,14 +128,14 @@ function getTimestampDiffSQL(field1: string, field2: string): string {
 
 function getSearchSQL(column: string): string {
   const db = getDatabaseType();
-  const like = db === POSTGRESQL ? 'ilike' : 'like';
+  const like = db === POSTGRESQL || db === COCKROACHDB ? 'ilike' : 'like';
 
   return `and ${column} ${like} {{search}}`;
 }
 
 function mapFilter(column: string, operator: string, name: string, type: string = '') {
   const db = getDatabaseType();
-  const like = db === POSTGRESQL ? 'ilike' : 'like';
+  const like = db === POSTGRESQL || db === COCKROACHDB ? 'ilike' : 'like';
   const value = `{{${name}${type ? `::${type}` : ''}}}`;
 
   switch (operator) {
