@@ -1,7 +1,7 @@
 import debug from 'debug';
 import { Prisma } from '@prisma/client';
 import prisma from '@umami/prisma-client';
-import moment from 'moment-timezone';
+import { formatInTimeZone } from 'date-fns-tz';
 import { MYSQL, POSTGRESQL, COCKROACHDB, getDatabaseType } from 'lib/db';
 import { SESSION_COLUMNS, OPERATORS, DEFAULT_PAGE_SIZE } from './constants';
 import { fetchWebsite } from './load';
@@ -82,7 +82,7 @@ function getDateSQL(field: string, unit: string, timezone?: string): string {
 
   if (db === MYSQL) {
     if (timezone) {
-      const tz = moment.tz(timezone).format('Z');
+      const tz = formatInTimeZone(new Date(), timezone, 'xxx');
       return `date_format(convert_tz(${field},'+00:00','${tz}'), '${MYSQL_DATE_FORMATS[unit]}')`;
     }
     return `date_format(${field}, '${MYSQL_DATE_FORMATS[unit]}')`;
@@ -97,7 +97,7 @@ function getDateWeeklySQL(field: string, timezone?: string) {
   }
 
   if (db === MYSQL) {
-    const tz = moment.tz(timezone).format('Z');
+    const tz = formatInTimeZone(new Date(), timezone, 'xxx');
     return `date_format(convert_tz(${field},'+00:00','${tz}'), '%w:%H')`;
   }
 }
@@ -126,11 +126,11 @@ function getTimestampDiffSQL(field1: string, field2: string): string {
   }
 }
 
-function getSearchSQL(column: string): string {
+function getSearchSQL(column: string, param: string = 'search'): string {
   const db = getDatabaseType();
   const like = db === POSTGRESQL || db === COCKROACHDB ? 'ilike' : 'like';
 
-  return `and ${column} ${like} {{search}}`;
+  return `and ${column} ${like} {{${param}}`;
 }
 
 function mapFilter(column: string, operator: string, name: string, type: string = '') {
